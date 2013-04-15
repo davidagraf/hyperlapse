@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html> 
+<head> 
+	<title>Simple Example</title> 
+
+	<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false" type="text/javascript"></script> 
+	<script src="./three.min.js"></script>
+	<script src="./GSVPano.js"></script>
+	<script src="./Hyperlapse.js"></script>
+	<script> 
+
+		function init() {
+
+			var hyperlapse = new Hyperlapse(document.getElementById('pano'), {
+				lookat: new google.maps.LatLng(47.4114,8.428),
+				zoom: 1,
+				use_lookat: true,
+        elevation: 50,
+        distance_between_points: 50,
+        max_points: 1000000
+			});
+
+			hyperlapse.onError = function(e) {
+				console.log(e);
+			};
+
+			hyperlapse.onRouteComplete = function(e) {
+				hyperlapse.load();
+			};
+
+			hyperlapse.onLoadComplete = function(e) {
+				hyperlapse.play();
+			};
+
+			// Google Maps API stuff here...
+			var directions_service = new google.maps.DirectionsService();
+
+			var route = {
+				request:{
+					origin: new google.maps.LatLng(47.5101,8.0237),
+					destination: new google.maps.LatLng(47.4114,8.428),
+					travelMode: google.maps.DirectionsTravelMode.DRIVING
+				}
+			};
+
+			directions_service.route(route.request, function(response, status) {
+				if (status == google.maps.DirectionsStatus.OK) {
+					hyperlapse.generate( {route:response} );
+				} else {
+					console.log(status);
+				}
+			});
+
+		}
+
+		window.onload = init;
+		
+	</script> 
+</head> 
+<body> 
+	<div id="pano"></div>
+</body> 
+</html>
